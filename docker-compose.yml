@@ -1,0 +1,35 @@
+version: '2'
+services:
+  db:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql123
+      MYSQL_DATABASE: exam_learning_development
+    tmpfs:
+      - /var/lib/mysql
+
+  app:
+    build:
+      context: .
+      # dockerfile: Dockerfile.dev
+      args:
+        RAILS_MASTER_KEY: ed27dfa07a3d3d2eca598e2c6bf6a21a16884bd53b34c9c824ddd44249cc69d87c2a18f55c70a9f6c280eca6c522b423893f5d5a0865ef8a95b943fa9a7aa251
+    ports:
+      - "80:3000"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: mysql2://root:mysql123@db/exam_learning_development?reconnect=true&encoding=utf8mb4&prepared_statements=true
+    tmpfs:
+      - /var/rails/tmp
+
+  swagger:
+    image: swaggerapi/swagger-ui
+    volumes:
+      - ./public/sample.yaml:/usr/share/nginx/html/sample.yaml
+    environment:
+      API_URL: ./sample.yaml
+    ports:
+      - "8080:8080"
